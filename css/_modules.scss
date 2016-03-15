@@ -1,0 +1,14 @@
+$theme: #90B2FF;
+body {
+    background-color: $theme;
+}
+
+#window {
+	@extend .absolute-center-middle;
+	position: fixed;
+	width: 1024px;
+	height: 90%;
+	.chatbox {
+		margin: auto;
+	}
+}

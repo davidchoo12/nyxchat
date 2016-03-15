@@ -1,0 +1,70 @@
+.clickable {
+  cursor: pointer; }
+
+.absolute-middle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%); }
+
+.absolute-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%); }
+
+.absolute-center-middle, #window {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%); }
+
+* {
+  margin: 0;
+  padding: 0; }
+
+body {
+  background-color: #90B2FF; }
+
+#window {
+  position: fixed;
+  width: 1024px;
+  height: 90%;
+  overflow-y: hidden;
+  background-color: #FFF; }
+  #window .header {
+    height: 50px; }
+  #window .chatListViewport {
+    display: inline-block;
+    width: 40%;
+    overflow-y: auto; }
+    #window .chatListViewport #chatList .chatItem {
+      padding: 8px 12px;
+      border: 1px solid grey; }
+      #window .chatListViewport #chatList .chatItem .chatAvatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        overflow: hidden; }
+      #window .chatListViewport #chatList .chatItem .chatTitle {
+        margin: 7px; }
+      #window .chatListViewport #chatList .chatItem .chatMessage {
+        margin: 7px; }
+  #window .main {
+    display: inline-block;
+    vertical-align: top;
+    width: 60%;
+    margin: auto; }
+    #window .main .message {
+      list-style: none;
+      overflow: auto; }
+      #window .main .message .in {
+        float: left; }
+      #window .main .message .out {
+        float: right; }
+    #window .main footer {
+      position: absolute;
+      bottom: 0;
+      width: inherit; }
+      #window .main footer #messageInput {
+        width: 100%; }
+
+/*# sourceMappingURL=site.css.map */

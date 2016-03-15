@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Nyx Chat login</title>
+	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/site.css">
+	<script src="bower_components/firebase/firebase.js"></script>
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+</head>
+<body>
+	Email:
+	<input type="text" name="email"><br />
+	Password:
+	<input type="password" name="password"><br />
+	<input type="button" id="signIn" value="Sign in">
+	<input type="button" id="signUp" value="Sign up">
+	<script>
+		var ref = new Firebase("https://boiling-fire-6255.firebaseio.com");
+		var email, password, user;
+		$('#signUp').click(function(){
+			populateVars();
+			ref.createUser(user, function(error, userData) {
+			  	if (error) {
+			    	alert("Error creating user:", error);
+			  	} else {
+			  		//add new user to db
+			  		ref.child('users/' + userData.uid).push(user);
+			    	//sign in the user
+					signIn(user);
+			  	}
+			});
+		});
+
+		$('#signIn').click(function(){
+			populateVars();
+			signIn(user);
+		});
+
+		function populateVars() {
+			email = $('input[name="email"]').val();
+			password = $('input[name="password"]').val();
+			user = {email: email, password: password};
+		}
+		function signIn(user) {
+			ref.authWithPassword(user, function(error, authData) {
+			  	if (error) {
+			    	alert("Login Failed!", error);
+			  	} else {
+					//redirect the user to chat.html
+					location = 'index.html';
+			  	}
+			});
+		}
+	</script>
+</body>
+</html>

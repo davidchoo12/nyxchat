@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Nyx Chat</title>
+	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/site.css">
+	<script src="bower_components/firebase/firebase.js"></script>
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+	<!-- <script src="https://cdn.firebase.com/js/client/2.4.1/firebase.js"></script> -->
+	<!-- <script src="//code.jquery.com/jquery-1.12.0.min.js"></script> -->
+	<!-- Firechat -->
+	<link rel='stylesheet' href='https://cdn.firebase.com/libs/firechat/2.0.1/firechat.min.css' />
+	<script src='https://cdn.firebase.com/libs/firechat/2.0.1/firechat.min.js'></script>
+</head>
+<body>
+	<div id="window">
+		<!-- <a href='#' onclick='initChat();'>Login with Twitter</a> -->
+		<!-- <div id='firechat-wrapper'></div> -->
+		<div class="chatListViewport">
+			<div class="header">
+				Nyx Chat (layout referenced from Whatsapp Web and Telegram Web)
+			</div>
+			<ul id="chatList">
+			</ul>
+		</div><!-- to clear whitespace
+	 --><div class="main">
+			<div class="header">Select who you wanna talk with on the left (enter with shift key to simulate message received)</div>
+			<ul id="messageList"></ul>
+			<footer>
+				<input type="text" id="messageInput" />
+			</footer>
+		</div>
+		<div class="firechat">
+			
+		</div>
+	</div>
+	<!-- CHAT JAVACRIPT -->
+	<script>
+		'use strict';
+		// CREATE A REFERENCE TO FIREBASE
+		var ref = new Firebase('https://boiling-fire-6255.firebaseio.com/chat/');
+		var authData = ref.getAuth();
+		// .displayName attribute available for twitter and fb auth, but not for email, there are also other types of auth but havent try
+		if(authData.provider == 'password')
+		authData.password.displayName = authData.password.email.replace(/@.*/, '');
+		var userName = authData[authData.provider].displayName;
+		var uid = authData.uid;
+
+		ref = ref.child(uid);
+		var chatList = $('#chatList');
+		ref.limitToLast(10).on('child_added', function(snapshot) {
+			var data = snapshot.val();
+			if(data.name != null) { 
+				//improvement idea: use js object to model the chatItem
+				var chatItem = $('<li class="clickable chatItem">')
+					.data('chatId', snapshot.key())
+					.data('chatTitle', data.name)
+					.append($('<div class="pull-right chatTime">').text('1:00 PM'))
+					.append($('<img class="chatAvatar">').attr('src', data.avatar))
+					.append($('<span class="chatTitle">').text(data.name))
+					.click(function(e) {chatItemClickHandler(e);});
+					//.append($('<div class="chatMessage">').text())
+				chatList.append(chatItem);
+			}
+		});
+
+		var chatId;
+		var chatName;
+		var chatRef;
+		function chatItemClickHandler(e) {
+			var messageList = $('#messageList');
+			messageList.empty(); //clear message list
+
+			chatId = $(e.target).data('chatId');
+			ref.child(chatId).once('value', function(snapshot){chatName = snapshot.val().name})
+			chatRef = ref.child(chatId).child('messages');
+			chatRef.limitToLast(10).on('child_added', function(snapshot) {
+				var data = snapshot.val();
+				var text = data.text;
+				var target = data.target;
+				name = data.target == 'in' ? chatName : userName;
+
+				var message = $('<li class="message">')
+					.append($('<div class="' + target + '">')
+						.append($('<div class="name">').text(name))
+						.append($('<div class="text">').text(text)));
+				messageList.append(message);
+				//scroll to bottom
+				messageList[0].scrollTop = messageList[0].scrollHeight;
+			});
+		};
+
+		var messageInput = $('#messageInput');
+
+		messageInput.keypress(function(e) {
+			if(e.keyCode == 13 && !e.shiftKey){ //if entered
+				var message = messageInput.val();
+				chatRef.push({target: 'out', text: message});
+				messageInput.val(''); //clear field
+			} else if (e.keyCode == 13 && e.shiftKey) { //if entered with shift
+				var message = messageInput.val();
+				chatRef.push({target: 'in', text: message});
+				messageInput.val(''); //clear field
+			}
+		});
+		
+
+
+	  // REGISTER DOM ELEMENTS
+	 //  var messageField = $('#messageInput');
+	 //  var messageList = $('#messageList');
+
+	 //  // LISTEN FOR KEYPRESS EVENT
+	 //  messageField.keypress(function (e) {
+	 //    if (e.keyCode == 13) {
+	 //      //FIELD VALUES
+	 //      var username = "test";
+	 //      var message = messageField.val();
+
+	 //      //SAVE DATA TO FIREBASE AND EMPTY FIELD
+	 //      ref.push({name:username, text:message});
+	 //      messageField.val('');
+	 //    }
+	 //  });
+
+	 //  // Add a callback that is triggered for each chat message.
+	 //  ref.limitToLast(10).on('child_added', function (snapshot) {
+	 //    //GET DATA
+	 //    var data = snapshot.val();
+	 //    var username = data.name || "anonymous";
+	 //    var message = data.text;
+
+	 //    //CREATE ELEMENTS MESSAGE & SANITIZE TEXT
+	 //    var messageElement = $("<li>");
+	 //    var nameElement = $("<strong class='example-chat-username'></strong>")
+	 //    nameElement.text(username);
+	 //    messageElement.text(message).prepend(nameElement);
+
+	 //    //ADD MESSAGE
+	 //    messageList.append(messageElement)
+
+	 //    //SCROLL TO BOTTOM OF MESSAGE LIST
+	 //    messageList[0].scrollTop = messageList[0].scrollHeight;
+	 //  });
+
+	 //  	var chatRef = new Firebase('https://boiling-fire-6255.firebaseio.com/chat');
+
+		// function initChat() {
+		// 	authData = chatRef.getAuth();
+		// 	if(authData.provider == 'password') authData.password.displayName = authData.password.email.replace(/@.*/, '');
+		// 	var chat = new FirechatUI(chatRef, document.getElementById('firechat-wrapper'));
+		// 	chat.setUser(authData.uid, authData[authData.provider].displayName);
+		// }
+	</script>
+</body>
+</html>

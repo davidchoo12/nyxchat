@@ -1,0 +1,73 @@
+@import '_commons.scss';
+
+$theme: #90B2FF;
+$windowWidth: 1024px;
+$windowHeight: 90%;
+$headerHeight: 50px;
+
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+    background-color: $theme;
+}
+
+#window {
+	@extend .absolute-center-middle;
+	position: fixed;
+	width: $windowWidth;
+	height: $windowHeight;
+	overflow-y: hidden;
+	background-color: #FFF;
+	.header {
+		height: $headerHeight;
+	}
+	.chatListViewport {
+		display: inline-block;
+		width: 40%;
+		overflow-y: auto;
+		#chatList {
+			.chatItem {
+				padding: 8px 12px;
+				border: 1px solid grey;
+				.chatAvatar {
+					width: 50px;
+					height: 50px;
+					border-radius: 50%;
+					overflow: hidden;
+				}
+				.chatTitle {
+					margin: 7px;
+				}
+				.chatMessage {
+					margin: 7px;
+				}
+			}
+		}
+	}
+	.main {
+		display: inline-block;
+		vertical-align: top;
+		width: 60%;
+		margin: auto;
+		.message {
+			list-style: none;
+			overflow: auto;
+			.in {
+				float: left;
+			}
+			.out {
+				float: right;
+			}
+		}
+		footer {
+			position: absolute;
+			bottom: 0;
+			width: inherit;
+			#messageInput {
+				width: 100%;
+			}
+		}
+	}
+}
